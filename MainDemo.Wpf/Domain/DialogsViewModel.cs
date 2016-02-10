@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
+using MaterialDesignColors.WpfExample.Domain;
 using MaterialDesignThemes.Wpf;
 
-namespace MaterialDesignColors.WpfExample.Domain
+namespace MaterialDesignDemo.Domain
 {
     public class DialogsViewModel : INotifyPropertyChanged
     {
@@ -33,7 +29,7 @@ namespace MaterialDesignColors.WpfExample.Domain
             //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new SampleDialog
             {
-                DataContext = new object()
+                DataContext = new SampleDialogViewModel()
             };
             
             //show the dialog
@@ -53,14 +49,19 @@ namespace MaterialDesignColors.WpfExample.Domain
             //let's set up a little MVVM, cos that's what the cool kids are doing:
             var view = new SampleDialog
             {
-                DataContext = new object()
+                DataContext = new SampleDialogViewModel()
             };
 
             //show the dialog
-            var result = await DialogHost.Show(view, "RootDialog", ExtendedClosingEventHandler);
+            var result = await DialogHost.Show(view, "RootDialog", ExtendedOpenedEventHandler, ExtendedClosingEventHandler);
 
             //check the result...
             Console.WriteLine("Dialog was closed, the CommandParameter used to close it was: " + (result ?? "NULL"));
+        }
+
+        private void ExtendedOpenedEventHandler(object sender, DialogOpenedEventArgs eventargs)
+        {
+            Console.WriteLine("You could intercept the open and affect the dialog using eventArgs.Session.");
         }
 
         private void ExtendedClosingEventHandler(object sender, DialogClosingEventArgs eventArgs)

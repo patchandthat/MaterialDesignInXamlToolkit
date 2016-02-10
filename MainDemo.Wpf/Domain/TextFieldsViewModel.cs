@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,13 +12,14 @@ namespace MaterialDesignColors.WpfExample.Domain
 {
     public class TextFieldsViewModel : INotifyPropertyChanged
     {
-        private readonly IList<int> _longListToTestComboVirtualization;
-            
         private string _name;
+        private int _selectedValueOne;
 
         public TextFieldsViewModel()
         {
-            _longListToTestComboVirtualization = new List<int>(Enumerable.Range(0, 1000));            
+            LongListToTestComboVirtualization = new List<int>(Enumerable.Range(0, 1000));
+
+            SelectedValueOne = LongListToTestComboVirtualization.Skip(2).First();
         }
 
         public string Name
@@ -25,18 +27,28 @@ namespace MaterialDesignColors.WpfExample.Domain
             get { return _name; }
             set
             {
-                _name = value;
-                OnPropertyChanged();
+                this.MutateVerbose(ref _name, value, RaisePropertyChanged());
             }
         }
 
-        public IList<int> LongListToTestComboVirtualization => _longListToTestComboVirtualization;
+        public int SelectedValueOne
+        {
+            get { return _selectedValueOne; }
+            set
+            {
+                this.MutateVerbose(ref _selectedValueOne, value, RaisePropertyChanged());
+            }
+        }
+
+        public IList<int> LongListToTestComboVirtualization { get; }
+
+        public DemoItem DemoItem => new DemoItem { Name = "Mr. Test"};
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private Action<PropertyChangedEventArgs> RaisePropertyChanged()
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return args => PropertyChanged?.Invoke(this, args);
         }
     }
 }

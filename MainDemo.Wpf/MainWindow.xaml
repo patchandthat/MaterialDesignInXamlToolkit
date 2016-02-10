@@ -3,19 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
         xmlns:wpfExample="clr-namespace:MaterialDesignColors.WpfExample"
         xmlns:domain="clr-namespace:MaterialDesignColors.WpfExample.Domain"
-        xmlns:wpf="clr-namespace:MaterialDesignThemes.Wpf;assembly=MaterialDesignThemes.Wpf"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:domain1="clr-namespace:MaterialDesignDemo.Domain"
+        xmlns:materialDesignDemo="clr-namespace:MaterialDesignDemo"
         Title="Material Design in XAML" Height="800" Width="1100"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Medium"
-        TextElement.FontSize="14"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto" Icon="favicon.ico">
+        FontFamily="{StaticResource MaterialDesignFont}" Icon="favicon.ico">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Shadows.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -26,17 +29,18 @@
                     <TextBlock>England win the World Cup:</TextBlock>
                     <TextBlock Margin="0 8 0 0" Text="{Binding }" />
                     <TextBlock Margin="0 8 0 0" >You will never see that again.</TextBlock>
-                    <Button  Margin="0 8 0 0" IsDefault="True" Command="{x:Static wpf:DialogHost.CloseDialogCommand}" Style="{DynamicResource MaterialDesignFlatButton}">AWESOME</Button>
+                    <Button  Margin="0 8 0 0" IsDefault="True" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" Style="{DynamicResource MaterialDesignFlatButton}">AWESOME</Button>
                 </StackPanel>
             </DataTemplate>
         </ResourceDictionary>
     </Window.Resources>
 
-    <wpf:DialogHost Identifier="RootDialog">
-        <wpf:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
-            <wpf:DrawerHost.LeftDrawerContent>
-                <StackPanel Orientation="Vertical">
+    <materialDesign:DialogHost Identifier="RootDialog">
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel MinWidth="212">
                     <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                  DockPanel.Dock="Top"
                                   HorizontalAlignment="Right" Margin="16"
                                   IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
                     <ListBox x:Name="DemoItemsListBox" Margin="0 16 0 16" SelectedIndex="0"                         
@@ -70,9 +74,37 @@
                                 <wpfExample:TextFields />
                             </domain:DemoItem.Content>
                         </domain:DemoItem>
+                        <domain:DemoItem Name="Pickers">
+                            <domain:DemoItem.Content>
+                                <wpfExample:Pickers>
+                                    <wpfExample:Pickers.DataContext>
+                                        <wpfExample:PickersViewModel />
+                                    </wpfExample:Pickers.DataContext>
+                                </wpfExample:Pickers>
+                            </domain:DemoItem.Content>
+                        </domain:DemoItem>
+                        <domain:DemoItem Name="Sliders">
+                            <domain:DemoItem.Content>
+                                <wpfExample:Sliders />
+                            </domain:DemoItem.Content>
+                        </domain:DemoItem>
+                        <domain:DemoItem Name="Typography">
+                            <domain:DemoItem.Content>
+                                <wpfExample:Typography />
+                            </domain:DemoItem.Content>
+                        </domain:DemoItem>
                         <domain:DemoItem Name="Cards">
                             <domain:DemoItem.Content>
                                 <wpfExample:Cards />
+                            </domain:DemoItem.Content>
+                        </domain:DemoItem>
+                        <domain:DemoItem Name="Icon Pack">
+                            <domain:DemoItem.Content>
+                                <materialDesignDemo:IconPack>
+                                    <materialDesignDemo:IconPack.DataContext>
+                                        <materialDesignDemo:IconPackViewModel />
+                                    </materialDesignDemo:IconPack.DataContext>
+                                </materialDesignDemo:IconPack>
                             </domain:DemoItem.Content>
                         </domain:DemoItem>
                         <domain:DemoItem Name="Colour Zones">
@@ -91,7 +123,11 @@
                         </domain:DemoItem>
                         <domain:DemoItem Name="Trees">
                             <domain:DemoItem.Content>
-                                <wpfExample:Trees />
+                                <wpfExample:Trees>
+                                    <wpfExample:Trees.DataContext>
+                                        <domain:TreesViewModel/>
+                                    </wpfExample:Trees.DataContext>
+                                </wpfExample:Trees>
                             </domain:DemoItem.Content>
                         </domain:DemoItem>
                         <domain:DemoItem Name="Grids">
@@ -101,6 +137,11 @@
                                         <domain:ListsAndGridsViewModel />
                                     </wpfExample:Grids.DataContext>
                                 </wpfExample:Grids>
+                            </domain:DemoItem.Content>
+                        </domain:DemoItem>
+                        <domain:DemoItem Name="Expander">
+                            <domain:DemoItem.Content>
+                                <wpfExample:Expander />
                             </domain:DemoItem.Content>
                         </domain:DemoItem>
                         <domain:DemoItem Name="Menus &amp; Tool Bars">
@@ -117,7 +158,7 @@
                             <domain:DemoItem.Content>
                                 <wpfExample:Dialogs>
                                     <wpfExample:Dialogs.DataContext>
-                                        <domain:DialogsViewModel />
+                                        <domain1:DialogsViewModel />
                                     </wpfExample:Dialogs.DataContext>
                                 </wpfExample:Dialogs>
                             </domain:DemoItem.Content>
@@ -128,19 +169,26 @@
                             </domain:DemoItem.Content>
                         </domain:DemoItem>
                     </ListBox>
-                </StackPanel>
-            </wpf:DrawerHost.LeftDrawerContent>
+                </DockPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
             <DockPanel>
-                <wpf:ColorZone Padding="16" wpf:ShadowAssist.ShadowDepth="Depth2"
-                               Mode="PrimaryMid" DockPanel.Dock="Top">
+                <materialDesign:ColorZone Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                          Mode="PrimaryMid" DockPanel.Dock="Top">
                     <DockPanel>
                         <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
                                       x:Name="MenuToggleButton"/>
+                        <materialDesign:PopupBox DockPanel.Dock="Right" PlacementMode="BottomAndAlignRightEdges">
+                            <StackPanel>
+                                <Button Content="Hello World" Click="MenuPopupButton_OnClick"/>
+                                <Button Content="Nice Popup" Click="MenuPopupButton_OnClick"/>
+                                <Button Content="Goodbye" Click="MenuPopupButton_OnClick"/>
+                            </StackPanel>
+                        </materialDesign:PopupBox>
                         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22">Material Design In XAML Toolkit</TextBlock>
                     </DockPanel>
-                </wpf:ColorZone>
-                <ContentControl Margin="16" Content="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.Content}" />
+                </materialDesign:ColorZone>
+                <ContentControl Margin="16" Content="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.Content}" />                
             </DockPanel>
-        </wpf:DrawerHost>
-    </wpf:DialogHost>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
 </Window>

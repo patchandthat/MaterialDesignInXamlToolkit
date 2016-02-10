@@ -51,6 +51,8 @@ namespace mdresgen
                 GenerateOldXaml(xDocument, true);
             else if (args.Contains("old"))
                 GenerateOldXaml(xDocument, false);
+            else if (args.Contains("icons"))
+                new IconThing().Run();
             else
                 GenerateXaml(xDocument, false);
 
@@ -78,6 +80,8 @@ namespace mdresgen
 
                 var longcolor = primary.Item1;
                 var shortcolor = longcolor.Replace(" ", "");
+
+                if (string.Compare(shortcolor, "black", StringComparison.InvariantCultureIgnoreCase) == 0) continue;
 
                 Console.WriteLine("{0} \t Primary: {1} \t Accent: {2}", longcolor.PadRight(15, ' '), !primaryEmpty, !accentEmpty);
 
