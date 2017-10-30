@@ -1,8 +1,8 @@
-using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
+using System.Windows.Documents;
 
 namespace MaterialDesignThemes.Wpf
 {
@@ -12,44 +12,13 @@ namespace MaterialDesignThemes.Wpf
     public static class TextFieldAssist
     {
         /// <summary>
-        /// The hint property
-        /// </summary>
-        public static readonly DependencyProperty HintProperty = DependencyProperty.RegisterAttached(
-            "Hint",
-            typeof(string),
-            typeof(TextFieldAssist),
-            new FrameworkPropertyMetadata(default(string), FrameworkPropertyMetadataOptions.Inherits));
-
-        /// <summary>
-        /// Sets the hint.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="value">The value.</param>
-        public static void SetHint(DependencyObject element, string value)
-        {
-            element.SetValue(HintProperty, value);
-        }
-
-        /// <summary>
-        /// Gets the hint.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <returns>
-        /// The <see cref="string" />.
-        /// </returns>
-        public static string GetHint(DependencyObject element)
-        {
-            return (string)element.GetValue(HintProperty);
-        }
-
-        /// <summary>
         /// The text box view margin property
         /// </summary>
         public static readonly DependencyProperty TextBoxViewMarginProperty = DependencyProperty.RegisterAttached(
             "TextBoxViewMargin",
             typeof(Thickness),
             typeof(TextFieldAssist),
-            new PropertyMetadata(new Thickness(double.NegativeInfinity), TextBoxViewMarginPropertyChangedCallback));
+            new FrameworkPropertyMetadata(new Thickness(double.NegativeInfinity), FrameworkPropertyMetadataOptions.Inherits, TextBoxViewMarginPropertyChangedCallback));
 
         /// <summary>
         /// Sets the text box view margin.
@@ -73,42 +42,12 @@ namespace MaterialDesignThemes.Wpf
             return (Thickness)element.GetValue(TextBoxViewMarginProperty);
         }
 
-        /// <summary>
-        /// The hint opacity property
-        /// </summary>
-        public static readonly DependencyProperty HintOpacityProperty = DependencyProperty.RegisterAttached(
-            "HintOpacity",
-            typeof(double),
-            typeof(TextFieldAssist),
-            new PropertyMetadata(.48));
-
-        /// <summary>
-        /// Gets the text box view margin.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <returns>
-        /// The <see cref="Thickness" />.
-        /// </returns>
-        public static double GetHintOpacityProperty(DependencyObject element)
-        {
-            return (double)element.GetValue(HintOpacityProperty);
-        }
-
-        /// <summary>
-        /// Sets the hint opacity.
-        /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="value">The value.</param>
-        public static void SetHintOpacity(DependencyObject element, double value)
-        {
-            element.SetValue(HintOpacityProperty, value);
-        }
 
         /// <summary>
         /// Controls the visibility of the underline decoration.
         /// </summary>
         public static readonly DependencyProperty DecorationVisibilityProperty = DependencyProperty.RegisterAttached(
-            "DecorationVisibility", typeof (Visibility), typeof (TextFieldAssist), new PropertyMetadata(default(Visibility)));
+            "DecorationVisibility", typeof(Visibility), typeof(TextFieldAssist), new PropertyMetadata(default(Visibility)));
 
         /// <summary>
         /// Controls the visibility of the underline decoration.
@@ -125,71 +64,171 @@ namespace MaterialDesignThemes.Wpf
         /// <returns></returns>
         public static Visibility GetDecorationVisibility(DependencyObject element)
         {
-            return (Visibility) element.GetValue(DecorationVisibilityProperty);
+            return (Visibility)element.GetValue(DecorationVisibilityProperty);
         }
 
         /// <summary>
-        /// Internal framework use only.
+        /// Controls the visbility of the text field box.
         /// </summary>
-        public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached(
-            "Text", typeof (string), typeof (TextFieldAssist), new PropertyMetadata(default(string), TextPropertyChangedCallback));
+        public static readonly DependencyProperty HasTextFieldBoxProperty = DependencyProperty.RegisterAttached(
+            "HasTextFieldBox", typeof(bool), typeof(TextFieldAssist), new PropertyMetadata(false));
 
-        /// <summary>
-        /// Internal framework use only.
-        /// </summary>
-        public static void SetText(DependencyObject element, string value)
+        public static void SetHasTextFieldBox(DependencyObject element, bool value)
         {
-            element.SetValue(TextProperty, value);
+            element.SetValue(HasTextFieldBoxProperty, value);
+        }
+
+        public static bool GetHasTextFieldBox(DependencyObject element)
+        {
+            return (bool)element.GetValue(HasTextFieldBoxProperty);
         }
 
         /// <summary>
-        /// Internal framework use only.
+        /// Controls the visibility of the text field area box.
         /// </summary>
-        public static string GetText(DependencyObject element)
+        public static readonly DependencyProperty HasTextAreaBoxProperty = DependencyProperty.RegisterAttached(
+            "HasTextAreaBox", typeof(bool), typeof(TextFieldAssist), new PropertyMetadata(false));
+
+        public static void SetHasTextAreaBox(DependencyObject element, bool value)
         {
-            return (string)element.GetValue(TextProperty);
+            element.SetValue(HasTextAreaBoxProperty, value);
         }
 
-        private static readonly DependencyPropertyKey IsNullOrEmptyPropertyKey = DependencyProperty.RegisterAttachedReadOnly(
-            "IsNullOrEmpty", typeof(bool), typeof(TextFieldAssist), new PropertyMetadata(true));
-
-        private static readonly DependencyProperty IsNullOrEmptyProperty =
-            IsNullOrEmptyPropertyKey.DependencyProperty;
-
-        private static void SetIsNullOrEmpty(DependencyObject element, bool value)
+        public static bool GetHasTextAreaBox(DependencyObject element)
         {
-            element.SetValue(IsNullOrEmptyPropertyKey, value);
-        }
-
-        public static bool GetIsNullOrEmpty(DependencyObject element)
-        {
-            return (bool)element.GetValue(IsNullOrEmptyProperty);
+            return (bool)element.GetValue(HasTextAreaBoxProperty);
         }
 
         /// <summary>
-        /// Framework use only.
+        /// Automatially inserts spelling suggestions into the text box context menu.
         /// </summary>
-        public static readonly DependencyProperty ManagedProperty = DependencyProperty.RegisterAttached(
-            "Managed", typeof(Control), typeof(TextFieldAssist), new PropertyMetadata(default(Control), ManagedPropertyChangedCallback));                
+        public static readonly DependencyProperty IncludeSpellingSuggestionsProperty = DependencyProperty.RegisterAttached(
+            "IncludeSpellingSuggestions", typeof(bool), typeof(TextFieldAssist), new PropertyMetadata(default(bool), IncludeSpellingSuggestionsChanged));
 
-
-        /// <summary>
-        /// Framework use only.
-        /// </summary>
-        public static void SetManaged(DependencyObject element, TextBox value)
+        public static void SetIncludeSpellingSuggestions(TextBoxBase element, bool value)
         {
-            element.SetValue(ManagedProperty, value);
+            element.SetValue(IncludeSpellingSuggestionsProperty, value);
         }
 
-        /// <summary>
-        /// Framework use only.
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        public static TextBox GetManaged(DependencyObject element)
+        public static bool GetIncludeSpellingSuggestions(TextBoxBase element)
         {
-            return (TextBox) element.GetValue(ManagedProperty);
-        }        
+            return (bool)element.GetValue(IncludeSpellingSuggestionsProperty);
+        }
+
+        private static void IncludeSpellingSuggestionsChanged(DependencyObject element, DependencyPropertyChangedEventArgs e)
+        {
+            var textBox = element as TextBoxBase;
+            if (textBox != null)
+            {
+                if ((bool)e.NewValue)
+                {
+                    textBox.ContextMenuOpening += TextBoxOnContextMenuOpening;
+                    textBox.ContextMenuClosing += TextBoxOnContextMenuClosing;
+                }
+                else
+                {
+                    textBox.ContextMenuOpening -= TextBoxOnContextMenuOpening;
+                    textBox.ContextMenuClosing -= TextBoxOnContextMenuClosing;
+                }
+            }
+        }
+
+        private static void TextBoxOnContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var textBoxBase = sender as TextBoxBase;
+
+            ContextMenu contextMenu = textBoxBase?.ContextMenu;
+            if (contextMenu == null) return;
+
+            RemoveSpellingSuggestions(contextMenu);
+
+            if (!SpellCheck.GetIsEnabled(textBoxBase)) return;
+
+            SpellingError spellingError = GetSpellingError(textBoxBase);
+            if (spellingError != null)
+            {
+                Style spellingSuggestionStyle =
+                    contextMenu.TryFindResource(Spelling.SuggestionMenuItemStyleKey) as Style;
+
+                int insertionIndex = 0;
+                bool hasSuggestion = false;
+                foreach (string suggestion in spellingError.Suggestions)
+                {
+                    hasSuggestion = true;
+                    var menuItem = new MenuItem
+                    {
+                        CommandTarget = textBoxBase,
+                        Command = EditingCommands.CorrectSpellingError,
+                        CommandParameter = suggestion,
+                        Style = spellingSuggestionStyle,
+                        Tag = typeof(Spelling)
+                    };
+                    contextMenu.Items.Insert(insertionIndex++, menuItem);
+                }
+                if (!hasSuggestion)
+                {
+                    contextMenu.Items.Insert(insertionIndex++, new MenuItem
+                    {
+                        Style = contextMenu.TryFindResource(Spelling.NoSuggestionsMenuItemStyleKey) as Style,
+                        Tag = typeof(Spelling)
+                    });
+                }
+
+                contextMenu.Items.Insert(insertionIndex++, new Separator
+                {
+                    Style = contextMenu.TryFindResource(Spelling.SeparatorStyleKey) as Style,
+                    Tag = typeof(Spelling)
+                });
+
+                contextMenu.Items.Insert(insertionIndex++, new MenuItem
+                {
+                    Command = EditingCommands.IgnoreSpellingError,
+                    CommandTarget = textBoxBase,
+                    Style = contextMenu.TryFindResource(Spelling.IgnoreAllMenuItemStyleKey) as Style,
+                    Tag = typeof(Spelling)
+                });
+
+                contextMenu.Items.Insert(insertionIndex, new Separator
+                {
+                    Style = contextMenu.TryFindResource(Spelling.SeparatorStyleKey) as Style,
+                    Tag = typeof(Spelling)
+                });
+            }
+        }
+
+        private static SpellingError GetSpellingError(TextBoxBase textBoxBase)
+        {
+            var textBox = textBoxBase as TextBox;
+            if (textBox != null)
+            {
+                return textBox.GetSpellingError(textBox.CaretIndex);
+            }
+            var richTextBox = textBoxBase as RichTextBox;
+            if (richTextBox != null)
+            {
+                return richTextBox.GetSpellingError(richTextBox.CaretPosition);
+            }
+            return null;
+        }
+
+        private static void TextBoxOnContextMenuClosing(object sender, ContextMenuEventArgs e)
+        {
+            var contextMenu = (sender as TextBoxBase)?.ContextMenu;
+            if (contextMenu != null)
+            {
+                RemoveSpellingSuggestions(contextMenu);
+            }
+        }
+
+        private static void RemoveSpellingSuggestions(ContextMenu menu)
+        {
+            foreach (FrameworkElement item in (from item in menu.Items.OfType<FrameworkElement>()
+                                     where ReferenceEquals(item.Tag, typeof(Spelling))
+                                     select item).ToList())
+            {
+                menu.Items.Remove(item);
+            }
+        }
 
         #region Methods
 
@@ -229,76 +268,14 @@ namespace MaterialDesignThemes.Wpf
 
             if (box.IsLoaded)
             {
-                ApplyTextBoxViewMargin(box, (Thickness) dependencyPropertyChangedEventArgs.NewValue);
+                ApplyTextBoxViewMargin(box, (Thickness)dependencyPropertyChangedEventArgs.NewValue);
             }
 
             box.Loaded += (sender, args) =>
             {
-                var textBox = (Control) sender;
+                var textBox = (Control)sender;
                 ApplyTextBoxViewMargin(textBox, GetTextBoxViewMargin(textBox));
             };
-        }
-
-        private static void TextPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-            var frameworkElement = (FrameworkElement)dependencyObject;
-
-            if (frameworkElement == null) return;
-
-            var state = string.IsNullOrEmpty((dependencyPropertyChangedEventArgs.NewValue ?? "").ToString())
-                ? "MaterialDesignStateTextEmpty"
-                : "MaterialDesignStateTextNotEmpty";
-
-            if (frameworkElement.IsLoaded)
-            {
-                VisualStateManager.GoToState(frameworkElement, state, true);
-            }
-            else
-            {
-                frameworkElement.Loaded += (sender, args) => VisualStateManager.GoToState(frameworkElement, state, false);
-                frameworkElement.IsVisibleChanged += (sender, args) => VisualStateManager.GoToState(frameworkElement, state, true);
-            }
-
-            SetIsNullOrEmpty(dependencyObject, string.IsNullOrEmpty((dependencyPropertyChangedEventArgs.NewValue ?? "").ToString()));
-        }
-
-        private static void ManagedPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-            var control = dependencyPropertyChangedEventArgs.OldValue as Control;
-            if (control != null)
-            {
-                control.IsVisibleChanged -= ManagedTextBoxOnIsVisibleChanged;                
-            }
-
-            control = dependencyPropertyChangedEventArgs.NewValue as Control;
-            if (control != null)
-            {
-                control.IsVisibleChanged += ManagedTextBoxOnIsVisibleChanged;                
-            }
-        }
-
-        private static void ManagedTextBoxOnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
-        {
-            if (!RefreshState(sender as TextBox, textBox => textBox.Text))
-                RefreshState(sender as ComboBox, comboBox => comboBox.Text);
-        }
-
-        private static bool RefreshState<TControl>(TControl control, Func<TControl,  string> textAccessor) where TControl : Control
-        {
-            if (control == null) return false;
-            if (!control.IsVisible) return true;
-
-            //yep, had to invoke post this to trigger refresh
-            control.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var state = string.IsNullOrEmpty(textAccessor(control))
-                    ? "MaterialDesignStateTextEmpty"
-                    : "MaterialDesignStateTextNotEmpty";
-
-                VisualStateManager.GoToState(control, state, false);
-            }));
-
-            return true;
         }
 
         #endregion

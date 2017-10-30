@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Markup;
 
 namespace MaterialDesignThemes.Wpf.Transitions
@@ -7,6 +6,11 @@ namespace MaterialDesignThemes.Wpf.Transitions
     [MarkupExtensionReturnType(typeof(TransitionEffectBase))]
     public class TransitionEffectExtension : MarkupExtension
     {
+        public TransitionEffectExtension()
+        {
+            Kind = TransitionEffectKind.None;
+        }
+
         public TransitionEffectExtension(TransitionEffectKind kind)
         {
             Kind = kind;

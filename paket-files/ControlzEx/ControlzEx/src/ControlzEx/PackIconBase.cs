@@ -1,7 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+#if NETFX_CORE
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+#else
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+#endif
 
 namespace ControlzEx
 {
@@ -30,8 +37,8 @@ namespace ControlzEx
                 _dataIndex = new Lazy<IDictionary<TKind, string>>(dataIndexFactory);
         }
 
-        public static readonly DependencyProperty KindProperty = DependencyProperty.Register(
-            nameof(Kind), typeof(TKind), typeof(PackIconBase<TKind>), new PropertyMetadata(default(TKind), KindPropertyChangedCallback));
+        public static readonly DependencyProperty KindProperty
+            = DependencyProperty.Register(nameof(Kind), typeof(TKind), typeof(PackIconBase<TKind>), new PropertyMetadata(default(TKind), KindPropertyChangedCallback));
 
         private static void KindPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
@@ -47,14 +54,9 @@ namespace ControlzEx
             set { SetValue(KindProperty, value); }
         }
 
-        private static readonly DependencyPropertyKey DataPropertyKey =
-            DependencyProperty.RegisterReadOnly(
-                "Data", typeof(string), typeof(PackIconBase<TKind>),
-                new PropertyMetadata(default(string)));
-
-        // ReSharper disable once StaticMemberInGenericType
-        public static readonly DependencyProperty DataProperty =
-            DataPropertyKey.DependencyProperty;
+#if NETFX_CORE
+        private static readonly DependencyProperty DataProperty
+            = DependencyProperty.Register(nameof(Data), typeof(string), typeof(PackIconBase<TKind>), new PropertyMetadata(""));
 
         /// <summary>
         /// Gets the icon path data for the current <see cref="Kind"/>.
@@ -62,10 +64,31 @@ namespace ControlzEx
         public string Data
         {
             get { return (string)GetValue(DataProperty); }
+            private set { SetValue(DataProperty, value); }
+        }
+#else
+        private static readonly DependencyPropertyKey DataPropertyKey
+            = DependencyProperty.RegisterReadOnly(nameof(Data), typeof(string), typeof(PackIconBase<TKind>), new PropertyMetadata(""));
+
+        // ReSharper disable once StaticMemberInGenericType
+        public static readonly DependencyProperty DataProperty = DataPropertyKey.DependencyProperty;
+
+        /// <summary>
+        /// Gets the icon path data for the current <see cref="Kind"/>.
+        /// </summary>
+        [TypeConverter(typeof(GeometryConverter))]
+        public string Data
+        {
+            get { return (string)GetValue(DataProperty); }
             private set { SetValue(DataPropertyKey, value); }
         }
+#endif
 
+#if NETFX_CORE
+        protected override void OnApplyTemplate()
+#else
         public override void OnApplyTemplate()
+#endif
         {
             base.OnApplyTemplate();
 

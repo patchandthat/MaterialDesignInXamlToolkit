@@ -1,5 +1,16 @@
 source https://nuget.org/api/v2
+framework: auto-detect
 
-github ControlzEx/ControlzEx:40a2be62474f0b78f2fd125a5b321e011acd5bb5 src/ControlzEx/PopupEx.cs
-github ControlzEx/ControlzEx:82ebaec4b7e2862baf74ab0cc53df6fffdb5e5c5 src/ControlzEx/PackIconBase.cs
+nuget MahApps.Metro
+nuget Dragablz ~> 0.0.3
+nuget Moq ~> 4.7
+nuget NSubstitute ~> 2.0
+nuget RhinoMocks 3.6.1
+nuget Shouldly ~> 2.8
+nuget XamlDisplayerPackage 1.0.5
+nuget xunit ~> 2.2
+
+github ControlzEx/ControlzEx:e687c6ac4279c4e513b7ef9a75622411350db874 src/ControlzEx/PopupEx.cs
+github ControlzEx/ControlzEx:e687c6ac4279c4e513b7ef9a75622411350db874 src/ControlzEx/PackIconBase.cs
+github ControlzEx/ControlzEx:e687c6ac4279c4e513b7ef9a75622411350db874 src/ControlzEx/BadgedEx.cs
 github samueldjack/VirtualCollection:e63d891c252c2ac1a3ebb26dddb9a3d89effe3f2 VirtualCollection/VirtualCollection/VirtualizingWrapPanel.cs

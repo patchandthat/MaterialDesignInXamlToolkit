@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace MaterialDesignThemes.Wpf.Transitions
         private ScaleTransform _scaleTransform;
         private SkewTransform _skewTransform;
         private TranslateTransform _translateTransform;
+
+        private bool _isOpeningEffectPending = false;
 
         static TransitioningContentBase()
         {
@@ -50,9 +53,11 @@ namespace MaterialDesignThemes.Wpf.Transitions
             if (_skewTransform != null)
                 RegisterName(SkewTransformPartName, _skewTransform);
             if (_translateTransform != null)
-                RegisterName(TranslateTransformPartName, _translateTransform);
+                RegisterName(TranslateTransformPartName, _translateTransform);            
 
             base.OnApplyTemplate();
+
+            RunOpeningEffects();
         }
 
         private void UnregisterNames(params string[] names)
@@ -75,6 +80,18 @@ namespace MaterialDesignThemes.Wpf.Transitions
             set { SetValue(OpeningEffectProperty, value); }
         }
 
+        public static readonly DependencyProperty OpeningEffectsOffsetProperty = DependencyProperty.Register(
+            "OpeningEffectsOffset", typeof (TimeSpan), typeof (TransitioningContentBase), new PropertyMetadata(default(TimeSpan)));
+
+        /// <summary>
+        /// Delay offset to be applied to all opening effect transitions.
+        /// </summary>
+        public TimeSpan OpeningEffectsOffset
+        {
+            get { return (TimeSpan) GetValue(OpeningEffectsOffsetProperty); }
+            set { SetValue(OpeningEffectsOffsetProperty, value); }
+        }
+
         /// <summary>
         /// Allows multiple transition effects to be combined and run upon the content loading or being made visible.
         /// </summary>
@@ -90,9 +107,16 @@ namespace MaterialDesignThemes.Wpf.Transitions
 
         string ITransitionEffectSubject.TranslateTransformName => TranslateTransformPartName;
 
+        TimeSpan ITransitionEffectSubject.Offset => OpeningEffectsOffset;
+
         protected virtual void RunOpeningEffects()
         {
-            if (!IsLoaded) return;
+            if (!IsLoaded || _matrixTransform == null)
+            {
+                _isOpeningEffectPending = true;
+                return;
+            }
+            _isOpeningEffectPending = false;
 
             var storyboard = new Storyboard();
             var openingEffect = OpeningEffect?.Build(this);

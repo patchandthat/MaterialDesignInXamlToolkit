@@ -33,12 +33,26 @@ namespace MaterialDesignThemes.Wpf.Transitions
             zIndexController.Stack(toSlide, fromSlide);
 
             var zeroKeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero);
-            var endKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300));
+            var midKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200));
+            var endKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(400));
+
+            var opacityAnimation = new DoubleAnimationUsingKeyFrames();
+            opacityAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(1, zeroKeyTime));
+            opacityAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(1, midKeyTime));
+            opacityAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(0, endKeyTime));
+            opacityAnimation.Completed += (sender, args) =>
+            {
+                fromSlide.BeginAnimation(UIElement.OpacityProperty, null);
+                fromSlide.Opacity = 0;
+            };
+            fromSlide.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
 
             var scaleAnimation = new DoubleAnimationUsingKeyFrames();
             scaleAnimation.Completed  += (sender, args) =>
             {
                 toSlide.SetCurrentValue(UIElement.ClipProperty, null);
+                fromSlide.BeginAnimation(UIElement.OpacityProperty, null);
+                fromSlide.Opacity = 0;
             };
             scaleAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(0, zeroKeyTime));
             scaleAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(1, endKeyTime));

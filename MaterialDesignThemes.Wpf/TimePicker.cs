@@ -26,6 +26,7 @@ namespace MaterialDesignThemes.Wpf
 		private Button _dropDownButton;
 		private bool _disablePopupReopen;
         private DateTime? _lastValidTime;
+	    private bool _isManuallyMutatingText;
 
         static TimePicker()
 		{
@@ -46,12 +47,13 @@ namespace MaterialDesignThemes.Wpf
 		}
 
 		public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            nameof(Text), typeof (string), typeof (TimePicker), new PropertyMetadata(default(string), TextPropertyChangedCallback));
+            nameof(Text), typeof (string), typeof (TimePicker), new FrameworkPropertyMetadata(default(string), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, TextPropertyChangedCallback));
 
 		private static void TextPropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
 		{
 			var timePicker = (TimePicker) dependencyObject;
-			timePicker.SetSelectedTime();
+            if (!timePicker._isManuallyMutatingText)
+			    timePicker.SetSelectedTime();
 			if (timePicker._textBox != null)
 				timePicker._textBox.Text = dependencyPropertyChangedEventArgs.NewValue as string;
 		}
@@ -68,7 +70,9 @@ namespace MaterialDesignThemes.Wpf
 		private static void SelectedTimePropertyChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
 		{
 			var timePicker = (TimePicker) dependencyObject;
-			timePicker.SetCurrentValue(TextProperty, timePicker.DateTimeToString(timePicker.SelectedTime));		
+		    timePicker._isManuallyMutatingText = true;
+			timePicker.SetCurrentValue(TextProperty, timePicker.DateTimeToString(timePicker.SelectedTime));
+            timePicker._isManuallyMutatingText = false;
             timePicker._lastValidTime = timePicker.SelectedTime;
         }
 
@@ -161,6 +165,19 @@ namespace MaterialDesignThemes.Wpf
 			set { SetValue(ClockHostContentControlStyleProperty, value); }
 		}
 
+	    public static readonly DependencyProperty IsInvalidTextAllowedProperty = DependencyProperty.Register(
+	        "IsInvalidTextAllowed", typeof (bool), typeof (TimePicker), new PropertyMetadata(default(bool)));
+
+        /// <summary>
+        /// Set to true to stop invalid text reverting back to previous valid value. Useful in cases where you
+        /// want to display validation messages and allow the user to correct the data without it reverting.
+        /// </summary>
+	    public bool IsInvalidTextAllowed
+	    {
+	        get { return (bool) GetValue(IsInvalidTextAllowedProperty); }
+	        set { SetValue(IsInvalidTextAllowedProperty, value); }
+	    }
+
 	    public override void OnApplyTemplate()
 		{
 			if (_popup != null)
@@ -214,9 +231,13 @@ namespace MaterialDesignThemes.Wpf
 
 		private void TextBoxOnLostFocus(object sender, RoutedEventArgs routedEventArgs)
 		{
-		    if (string.IsNullOrEmpty(_textBox?.Text)) return;
+		    if (string.IsNullOrEmpty(_textBox?.Text))
+            {
+                SetCurrentValue(SelectedTimeProperty, null);
+                return;
+            }
 
-		    DateTime time;
+            DateTime time;
 		    if (IsTimeValid(_textBox.Text, out time))
 		        SetCurrentValue(SelectedTimeProperty, time);
 
@@ -226,6 +247,8 @@ namespace MaterialDesignThemes.Wpf
 
         private void SetInvalidTime()
         {
+            if (IsInvalidTextAllowed) return;
+
             if (_lastValidTime != null)
             {
                 SetCurrentValue(SelectedTimeProperty, _lastValidTime.Value);
@@ -280,22 +303,31 @@ namespace MaterialDesignThemes.Wpf
 
 		private void TextBoxOnTextChanged(object sender, TextChangedEventArgs textChangedEventArgs)
 		{
-            if (_popup?.IsOpen == true)
+            if (_popup?.IsOpen == true || IsInvalidTextAllowed)
 			    SetCurrentValue(TextProperty, _textBox.Text);
+
+            if (_popup?.IsOpen == false)
+                SetSelectedTime(true);
         }
 
-		private void SetSelectedTime()
-		{
-		    if (!string.IsNullOrEmpty(_textBox?.Text))
+	    private void SetSelectedTime(bool beCautious = false)
+        {
+            if (!string.IsNullOrEmpty(_textBox?.Text))
 			{
-				ParseTime(_textBox.Text, t => SetCurrentValue(SelectedTimeProperty, t));			
-			}
-		}
+                ParseTime(_textBox.Text, t =>
+                {
+                    if (!beCautious || DateTimeToString(t) == _textBox.Text)
+                        SetCurrentValue(SelectedTimeProperty, t);
+                });
+            }
+            else
+            {
+                SetCurrentValue(SelectedTimeProperty, null);
+            }
+        }
 
-		private void ParseTime(string s, Action<DateTime> successContinuation)
+		private static void ParseTime(string s, Action<DateTime> successContinuation)
 		{
-			var dtfi = CultureInfo.CurrentCulture.GetDateFormat();
-
 			DateTime time;
             if (IsTimeValid(s, out time))
 				successContinuation(time);
@@ -386,11 +418,17 @@ namespace MaterialDesignThemes.Wpf
 			_clockHostContentControl.SetBinding(StyleProperty, GetBinding(ClockHostContentControlStyleProperty));
 		}
 
-		private void ClockChoiceMadeHandler(object sender, ClockChoiceMadeEventArgs clockChoiceMadeEventArgs)
-		{
-			if (clockChoiceMadeEventArgs.Mode == ClockDisplayMode.Minutes)
-				TogglePopup();
-		}
+        private void ClockChoiceMadeHandler(object sender, ClockChoiceMadeEventArgs clockChoiceMadeEventArgs)
+        {
+            if (clockChoiceMadeEventArgs.Mode == ClockDisplayMode.Minutes)
+            {
+                TogglePopup();
+                if (SelectedTime == null)
+                {
+                    SelectedTime = _clock.Time;
+                }
+            }
+        }
 
 		private void DropDownButtonOnClick(object sender, RoutedEventArgs routedEventArgs)
 		{

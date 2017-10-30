@@ -16,8 +16,8 @@ namespace MaterialDesignThemes.Wpf.Transitions
             if (zIndexController == null) throw new ArgumentNullException(nameof(zIndexController));
 
             var zeroKeyTime = KeyTime.FromTimeSpan(TimeSpan.Zero);
-            var midishKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(100));
-            var endKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300));
+            var midishKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200));
+            var endKeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(400));
 
             //back out old slide setup
             var scaleTransform = new ScaleTransform(1, 1);
@@ -27,7 +27,15 @@ namespace MaterialDesignThemes.Wpf.Transitions
             scaleAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(.8, endKeyTime));
             scaleAnimation.Completed += (sender, args) =>
             {
-                fromSlide.RenderTransform = null;
+                fromSlide.RenderTransform = null;                             
+            };
+            var opacityAnimation = new DoubleAnimationUsingKeyFrames();
+            opacityAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(1, zeroKeyTime));
+            opacityAnimation.KeyFrames.Add(new EasingDoubleKeyFrame(0, endKeyTime));
+            opacityAnimation.Completed += (sender, args) =>
+            {
+                fromSlide.BeginAnimation(UIElement.OpacityProperty, null);
+                fromSlide.Opacity = 0;
             };
 
             //slide in new slide setup
@@ -42,6 +50,7 @@ namespace MaterialDesignThemes.Wpf.Transitions
             translateTransform.BeginAnimation(TranslateTransform.YProperty, slideAnimation);
             scaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, scaleAnimation);            
             scaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, scaleAnimation);
+            fromSlide.BeginAnimation(UIElement.OpacityProperty, opacityAnimation);
 
             zIndexController.Stack(toSlide, fromSlide);
         }
